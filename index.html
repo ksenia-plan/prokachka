@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Прокачка">
+<meta name="theme-color" content="#0f131b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<title>Прокачка ЕГЭ</title>
+<style>
+:root{
+  --bg:#0f131b;--card:#171d29;--card2:#212a3a;--line:#2b3446;--fg:#eef1f6;--muted:#8a94a8;
+  --accent:#ff7a45;--accent-ink:#1a0f08;--ok:#3ecf8e;--bad:#ff5d6c;--bronze:#c98a52;--silver:#b9c4d4;--gold:#f2c14e;
+  --fd:ui-rounded,"SF Pro Rounded",-apple-system,"Segoe UI",system-ui,sans-serif;
+  --fb:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--fb);font-size:16px;-webkit-text-size-adjust:100%}
+body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+.app{max-width:560px;margin:0 auto;padding:14px max(16px,env(safe-area-inset-right)) 40px max(16px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--fd);font-weight:800;margin:0;letter-spacing:-.01em}
+h2{font-size:18px}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+button,select,input,textarea{font:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a{color:var(--accent)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+
+/* Шапка */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.rank{display:flex;align-items:center;gap:12px;min-width:0}
+.badge{width:48px;height:48px;border-radius:14px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--fd);font-weight:900;font-size:22px;flex:none}
+.xpbar{height:6px;background:var(--card2);border-radius:3px;overflow:hidden;margin-top:6px;width:150px}
+.xpbar i{display:block;height:100%;background:var(--accent);transition:width .5s}
+.exam{text-align:right;flex:none}
+.exam b{font-family:var(--fd);font-size:26px;display:block;line-height:1}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat b{font-family:var(--fd);font-size:32px;display:block;line-height:1.1;font-variant-numeric:tabular-nums}
+.flame{display:inline-block;width:13px;height:18px;background:var(--accent);border-radius:50%/60% 60% 40% 40%;margin-right:7px;vertical-align:1px}
+.flame.off{background:var(--card2)}
+.bar{height:8px;background:var(--card2);border-radius:4px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--ok);transition:width .5s}
+
+/* Тренировка дня */
+.mission{display:flex;flex-direction:column;gap:10px}
+.mrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 14px;border-radius:14px;background:var(--card2);text-align:left;width:100%}
+.mrow small{display:block;color:var(--muted);font-size:12px;margin-bottom:2px}
+.mrow b{font-size:15px}
+.go{background:var(--accent);color:var(--accent-ink);font-weight:800;padding:9px 16px;border-radius:12px;white-space:nowrap;font-size:14px}
+
+/* Дерево */
+.tabs{display:flex;gap:6px}
+.tab{flex:1;padding:11px 4px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-weight:800;font-size:13px;line-height:1.2}
+.tab span{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-top:2px}
+.tab.on{background:var(--fg);color:var(--bg)}
+.tab.on span{color:var(--bg);opacity:.7}
+.part{font-size:12px;font-weight:800;color:var(--muted);margin:10px 0 6px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.tile{position:relative;text-align:left;padding:11px 12px;min-height:74px;border-radius:14px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between;gap:6px}
+.tile .nm{font-weight:800;font-size:14px;line-height:1.2;padding-right:30px}
+.tile .lv{font-size:11px;color:var(--muted);font-weight:700}
+.l1{border-color:var(--bronze);box-shadow:inset 0 -4px 0 var(--bronze)}
+.l2{border-color:var(--silver);box-shadow:inset 0 -4px 0 var(--silver)}
+.l3{border-color:var(--gold);box-shadow:inset 0 -4px 0 var(--gold);background:linear-gradient(180deg,rgba(242,193,78,.16),var(--card))}
+.l1 .lv{color:var(--bronze)}.l2 .lv{color:var(--silver)}.l3 .lv{color:var(--gold)}
+.new::after{content:"2027";position:absolute;top:10px;right:10px;font-size:10px;font-weight:800;color:var(--accent)}
+
+.btn{padding:13px 16px;border-radius:14px;background:var(--card2);font-weight:800}
+.btn.pri{background:var(--accent);color:var(--accent-ink)}
+.btn.full{width:100%}
+.btn:disabled{opacity:.4}
+select,input,textarea{padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--card2);font-size:16px}
+input{width:96px}
+textarea{width:100%;min-height:90px;resize:vertical;font-size:13px}
+.rw{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
+.rw:last-child{border:0}
+.amt{font-family:var(--fd);font-weight:800;color:var(--gold);white-space:nowrap}
+.pill{font-size:12px;font-weight:800;padding:5px 10px;border-radius:99px;border:1px solid var(--accent);color:var(--accent);white-space:nowrap}
+.pill.ok{border-color:var(--ok);color:var(--ok)}
+.totals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 4px}
+.totals b{font-family:var(--fd);font-size:18px;display:block}
+
+/* Экран подхода */
+.screen{position:fixed;inset:0;background:var(--bg);z-index:20;overflow:auto;-webkit-overflow-scrolling:touch;
+  padding:calc(env(safe-area-inset-top) + 14px) max(16px,env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 20px) max(16px,env(safe-area-inset-left))}
+.sess{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.counter{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnt{border-radius:22px;padding:26px 10px;font-family:var(--fd);font-weight:800;font-size:18px;display:flex;flex-direction:column;align-items:center;gap:8px;user-select:none;-webkit-user-select:none}
+.cnt b{font-size:52px;line-height:1;font-variant-numeric:tabular-nums}
+.cnt.ok{background:var(--ok);color:#06140d}
+.cnt.bad{border:2px solid var(--bad);color:var(--bad)}
+.cnt:active{transform:scale(.96)}
+.dots{display:flex;gap:6px;justify-content:center}
+.dots i{width:34px;height:10px;border-radius:5px;background:var(--card2);transition:background .2s}
+.dots i.on{background:var(--gold)}
+.note{font-size:14px;border-left:3px solid var(--accent);background:rgba(255,122,69,.1);padding:10px 12px;border-radius:6px}
+
+/* Окна */
+.overlay{position:fixed;inset:0;background:rgba(4,6,10,.82);z-index:30;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px;width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px}
+.modal.reward{border-color:var(--gold);text-align:center;animation:pop .4s ease-out}
+.modal .sum{font-family:var(--fd);font-weight:900;font-size:52px;color:var(--gold);line-height:1}
+@keyframes pop{from{transform:scale(.8);opacity:.2}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.modal.reward{animation:none}}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 24px);transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);padding:12px 18px;border-radius:14px;z-index:40;font-weight:700;max-width:90%;text-align:center}
+
+/* Установка */
+.install{display:flex;flex-direction:column;gap:16px;padding-top:20px}
+.install img{width:84px;height:84px;border-radius:20px}
+.step{display:flex;gap:12px;align-items:flex-start}
+.step .n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:14px;font-weight:800}
+.share-ic{display:inline-block;width:16px;height:18px;border:2px solid var(--fg);border-top:0;border-radius:0 0 3px 3px;position:relative;vertical-align:-3px;margin:0 2px}
+.share-ic::before{content:"";position:absolute;left:5px;top:-8px;width:2px;height:12px;background:var(--fg)}
+.share-ic::after{content:"";position:absolute;left:2px;top:-9px;width:6px;height:6px;border-left:2px solid var(--fg);border-top:2px solid var(--fg);transform:rotate(45deg)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<div class="screen" id="screen" hidden></div>
+<div class="overlay" id="overlay" hidden></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+// ===================== Настройки =====================
+var NORM = 10;                       // заданий в день для стрика
+var EXAM = new Date(2027, 5, 1);     // 1 июня 2027 — начало основного периода ЕГЭ-2027 (проект расписания)
+var KEY = 'prokachka-ege-v1';
+
+var SUBJECTS = [
+  {id:'m', name:'Математика', short:'Матем.', link:'https://math-ege.sdamgia.ru/prob_catalog', parts:['','Часть 1','Часть 2'], blocks:[
+    ['Планиметрия',1],['Векторы',1],['Стереометрия',1],['Простая вероятность',1],['Сложная вероятность',1],
+    ['Случайные величины',1,'Новое в 2027: распределение, матожидание, дисперсия, стандартное отклонение. В старых сборниках этого нет.'],
+    ['Простые уравнения',1],['Вычисления и преобразования',1],['Производная и графики',1],
+    ['Прикладная задача',1],['Текстовая задача',1],['Графики функций',1],
+    ['Экономическая задача',1,'В 2027 она в первой части: нужен только ответ числом, без оформления.'],
+    ['Уравнение',2],['Стереометрия',2],['Неравенство',2],
+    ['Мат. модель',2,'Новое в 2027: задача из жизни или физики. Формулы даны в условии — надо выразить нужную величину и исследовать модель.'],
+    ['Планиметрия',2],['Параметр',2],['Числа и их свойства',2]
+  ]},
+  {id:'r', name:'Русский', short:'Русский', link:'https://rus-ege.sdamgia.ru/prob_catalog', parts:['','Тестовая часть','Сочинение'], blocks:[
+    ['Работа с текстом 1–3',1],['Ударения',1],['Паронимы',1],['Лексические нормы',1],['Морфологические нормы',1],
+    ['Синтаксические нормы',1],['Корни',1],['Приставки',1],['Суффиксы',1],['Окончания глаголов и причастий',1],
+    ['НЕ с разными частями речи',1],['Слитно, раздельно, через дефис',1],['Н и НН',1],
+    ['Запятые в простом предложении',1],['Обособления',1],['Вводные слова и обращения',1],
+    ['Сложное предложение',1],['Сложные синтаксические конструкции',1],['Анализ текста 22–26',1],
+    ['Сочинение',2,'Один подход = одно сочинение. «Верно» — если по самопроверке по критериям нет ошибок.']
+  ]},
+  {id:'e', name:'Английский', short:'Англ.', link:'https://en-ege.sdamgia.ru/prob_catalog', parts:['','Письменная часть','Письмо и эссе','Устная часть'], blocks:[
+    ['Аудирование',1],['Чтение',1],['Грамматика',1],['Словообразование',1],['Лексика в контексте',1],
+    ['Электронное письмо',2],['Эссе по таблице или диаграмме',2],
+    ['Чтение вслух',3,'Записывай себя на диктофон с таймером, как на экзамене, и слушай запись.'],['Вопросы и интервью',3],['Ответ по фото',3]
+  ]}
+];
+
+var REWARDS = {
+  gold:{amount:100, title:'Золото', desc:'5 верных подряд в одном блоке. За каждый блок один раз.'},
+  week:{amount:300, title:'7 дней подряд', desc:'Каждые 7 дней стрика (норма — 10 заданий в день).'},
+  m30:{amount:1500, title:'30 дней подряд', desc:'Месяц без пропусков. Один раз.'},
+  m100:{amount:5000, title:'100 дней подряд', desc:'Один раз.'},
+  boss:{amount:200, title:'Босс недели', desc:'3 задания второй части или сочинение/эссе без ошибок. Раз в неделю.'},
+  p70:{amount:500, title:'Пробник 70+', desc:'По каждому предмету один раз.'},
+  p80:{amount:1000, title:'Пробник 80+', desc:'По каждому предмету один раз.'},
+  p90:{amount:2000, title:'Пробник 90+', desc:'По каждому предмету один раз.'}
+};
+var RANKS = [[0,'Новичок'],[500,'Боец'],[1500,'Профи'],[3500,'Мастер'],[7000,'Легенда']];
+var LEVELS = ['не начато','бронза','серебро','золото'];
+
+// ===================== Хранение на телефоне =====================
+function blank(){return {v:1, log:[], rewards:[], awarded:{}}}
+function load(){try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&s.log&&s.rewards)return s}catch(e){}return blank()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Не удалось сохранить: память телефона заполнена')}}
+var S = load();
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+
+// ===================== Даты =====================
+function pad(n){return (n<10?'0':'')+n}
+function dk(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function parseDay(s){var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2],12)}
+function fmt(s){var p=s.split('-');return p[2]+'.'+p[1]+'.'+p[0]}
+function weekKey(day){var d=parseDay(day);d.setDate(d.getDate()-((d.getDay()+6)%7));return dk(d)}
+
+// ===================== Расчёт прогресса =====================
+function blockInfo(id){
+  var s=SUBJECTS.filter(function(x){return x.id===id.charAt(0)})[0];
+  if(!s)return null;var b=s.blocks[parseInt(id.slice(1),10)];
+  return b?{s:s,name:b[0],part:b[1],note:b[2]||''}:null;
+}
+function blockTitle(id){var x=blockInfo(id);return x.s.name+': '+x.name.toLowerCase()+(x.s.id==='m'?' (ч. '+x.part+')':'')}
+
+function compute(){
+  var blocks={},days={},xp=0,found=[],seen={};
+  SUBJECTS.forEach(function(s){s.blocks.forEach(function(b,i){blocks[s.id+i]={ok:0,bad:0,best:0,last:''}})});
+  function award(key,type,detail,day){if(!seen[key]){seen[key]=true;found.push({key:key,type:type,detail:detail,day:day})}}
+  function streakEnding(day){var c=0,d=parseDay(day);while((days[dk(d)]||0)>=NORM){c++;d.setDate(d.getDate()-1)}return c}
+  S.log.forEach(function(e){
+    var day=dk(new Date(e.t));
+    if(e.type==='tasks'&&blocks[e.b]){
+      var b=blocks[e.b];b.ok+=e.ok;b.bad+=e.bad;b.best=Math.max(b.best,e.best);b.last=e.t;
+      xp+=e.ok*10+e.bad*3;
+      if(b.best>=5)award('gold-'+e.b,'gold',blockTitle(e.b),day);
+      var before=days[day]||0;days[day]=before+e.ok+e.bad;
+      if(before<NORM&&days[day]>=NORM){
+        var st=streakEnding(day);
+        if(st>0&&st%7===0)award('week-'+day,'week',st+' дней',day);
+        if(st>=30)award('m30','m30','',day);
+        if(st>=100)award('m100','m100','',day);
+      }
+    }else if(e.type==='boss'){
+      var wk=weekKey(day);xp+=100;award('boss-'+wk,'boss','неделя с '+fmt(wk),day);
+    }else if(e.type==='probe'){
+      var s=SUBJECTS.filter(function(x){return x.id===e.subj})[0];xp+=150;
+      var d=s.name+', '+e.score+' баллов';
+      if(e.score>=70)award('p70-'+e.subj,'p70',d,day);
+      if(e.score>=80)award('p80-'+e.subj,'p80',d,day);
+      if(e.score>=90)award('p90-'+e.subj,'p90',d,day);
+    }
+  });
+  Object.keys(blocks).forEach(function(k){var b=blocks[k];b.level=b.best>=5?3:b.best>=3?2:b.ok>=1?1:0});
+  var today=dk(new Date()),d=new Date(),streak=0;
+  if((days[today]||0)<NORM)d.setDate(d.getDate()-1);
+  while((days[dk(d)]||0)>=NORM){streak++;d.setDate(d.getDate()-1)}
+  var readiness={};
+  SUBJECTS.forEach(function(s){var sum=0;s.blocks.forEach(function(b,i){sum+=blocks[s.id+i].level});readiness[s.id]=Math.round(sum/(s.blocks.length*3)*100)});
+  var rank=RANKS[0],next=null;
+  RANKS.forEach(function(r,i){if(xp>=r[0]){rank=r;next=RANKS[i+1]||null}});
+  var suggest=SUBJECTS.map(function(s){
+    var c=s.blocks.map(function(b,i){var x=blocks[s.id+i];return {id:s.id+i,lv:x.level,last:x.last}})
+      .filter(function(x){return x.lv<3})
+      .sort(function(a,b){return a.lv-b.lv||(a.last<b.last?-1:a.last>b.last?1:0)});
+    return c.length?c[0].id:null;
+  }).filter(Boolean);
+  return {blocks:blocks,days:days,today:days[today]||0,streak:streak,xp:xp,rank:rank,next:next,readiness:readiness,suggest:suggest,found:found,
+    bossDone:!!seen['boss-'+weekKey(today)]};
+}
+
+// Новые награды → кошелёк и окно «Отправить маме»
+var queue=[];
+function collectRewards(c){
+  c.found.forEach(function(f){
+    if(S.awarded[f.key])return;
+    var R=REWARDS[f.type];S.awarded[f.key]=true;
+    var r={key:f.key,title:R.title+(f.detail?': '+f.detail:''),amount:R.amount,date:f.day,sent:false,paid:false};
+    S.rewards.unshift(r);queue.push(r);
+  });
+  save();
+}
+
+// ===================== Интерфейс =====================
+var tab='m', sess=null, C=null;
+function el(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function rub(n){return Number(n).toLocaleString('ru-RU')+' ₽'}
+function plural(n,a,b,c){var m=n%10,h=n%100;return (m===1&&h!==11)?a:(m>=2&&m<=4&&(h<12||h>14))?b:c}
+function toast(t){var x=el('toast');x.textContent=t;x.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){x.hidden=true},2600)}
+function isStandalone(){return window.navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)}
+
+function render(){
+  C=compute();
+  var r=C,pct=r.next?Math.min(100,Math.round((r.xp-r.rank[0])/(r.next[0]-r.rank[0])*100)):100;
+  var examDays=Math.max(0,Math.round((EXAM-parseDay(dk(new Date())))/86400000));
+  var h='';
+  h+='<div class="top"><div class="rank"><div class="badge">'+esc(r.rank[1].charAt(0))+'</div><div style="min-width:0"><div class="lbl">Ранг</div><h3>'+esc(r.rank[1])+'</h3>'+
+     '<div class="xpbar"><i style="width:'+pct+'%"></i></div><div class="muted" style="font-size:11px;margin-top:4px">'+r.xp+' XP'+(r.next?' · до «'+esc(r.next[1])+'» '+(r.next[0]-r.xp):' · максимум')+'</div></div></div>'+
+     '<div class="exam"><span class="lbl">До ЕГЭ</span><b>'+examDays+'</b><span class="muted small">'+plural(examDays,'день','дня','дней')+'</span></div></div>';
+  h+='<div class="stats"><div class="card stat"><span class="lbl">Стрик</span><b><span class="flame'+(r.streak?'':' off')+'"></span>'+r.streak+'</b><span class="muted small">'+(r.today>=NORM?'норма на сегодня есть':'сделай норму, чтобы не сгорел')+'</span></div>'+
+     '<div class="card stat"><span class="lbl">Сегодня</span><b>'+r.today+'<span class="muted" style="font-size:15px"> / '+NORM+'</span></b><div class="bar"><i style="width:'+Math.min(100,r.today/NORM*100)+'%"></i></div></div></div>';
+
+  h+='<div class="card mission"><div class="row between"><h2>Тренировка дня</h2><span class="muted small">твои слабые места</span></div>';
+  if(!r.suggest.length)h+='<p class="muted">Все блоки на золоте. Пиши пробники.</p>';
+  r.suggest.forEach(function(id){var x=blockInfo(id);h+='<button class="mrow" data-go="'+id+'"><span><small>'+esc(x.s.name)+' · '+LEVELS[r.blocks[id].level]+'</small><b>'+esc(x.name)+(x.s.id==='m'?' · ч. '+x.part:'')+'</b></span><span class="go">Старт</span></button>'});
+  h+='</div>';
+
+  h+='<div class="tabs">';
+  SUBJECTS.forEach(function(s){h+='<button class="tab'+(s.id===tab?' on':'')+'" data-tab="'+s.id+'">'+esc(s.name)+'<span>готовность '+r.readiness[s.id]+'%</span></button>'});
+  h+='</div><div>';
+  var s=SUBJECTS.filter(function(x){return x.id===tab})[0],lastPart=0;
+  s.blocks.forEach(function(b,i){
+    if(b[1]!==lastPart){if(lastPart)h+='</div>';h+='<div class="part">'+esc(s.parts[b[1]])+'</div><div class="grid">';lastPart=b[1]}
+    var id=s.id+i,l=r.blocks[id].level,isNew=b[2]&&b[2].indexOf('Новое')===0;
+    h+='<button class="tile l'+l+(isNew?' new':'')+'" data-go="'+id+'"><span class="nm">'+esc(b[0])+'</span><span class="lv">'+LEVELS[l]+'</span></button>';
+  });
+  h+='</div></div>';
+
+  h+='<div class="card" style="display:flex;flex-direction:column;gap:16px"><h2>Босс и пробник</h2>'+
+     '<div class="row between" style="flex-wrap:nowrap"><div><b>Босс недели</b><p class="muted small">3 задания второй части или сочинение/эссе без ошибок в одном подходе</p></div>'+
+     '<button class="btn pri" id="boss"'+(r.bossDone?' disabled':'')+'>'+(r.bossDone?'Побеждён':'Победил')+'</button></div>'+
+     '<div><b>Пробник</b><p class="muted small" style="margin-bottom:10px">Полный вариант на Решу ЕГЭ с таймером. Впиши тестовый балл из 100.</p>'+
+     '<div class="row"><select id="psub">'+SUBJECTS.map(function(s){return '<option value="'+s.id+'">'+esc(s.name)+'</option>'}).join('')+'</select>'+
+     '<input id="pscore" type="number" inputmode="numeric" min="0" max="100" placeholder="балл"><button class="btn" id="probe">Записать</button></div></div></div>';
+
+  var earned=0,paid=0;S.rewards.forEach(function(x){earned+=x.amount;if(x.paid)paid+=x.amount});
+  h+='<div class="card"><h2>Кошелёк</h2><div class="totals"><div><span class="lbl">Заработано</span><b>'+rub(earned)+'</b></div><div><span class="lbl">Ждёт</span><b style="color:var(--accent)">'+rub(earned-paid)+'</b></div><div><span class="lbl">Получено</span><b style="color:var(--ok)">'+rub(paid)+'</b></div></div>';
+  if(!S.rewards.length)h+='<p class="muted small" style="padding-top:8px">Первая награда — золото: 5 верных подряд в одном блоке.</p>';
+  S.rewards.forEach(function(x,i){
+    h+='<div class="rw"><div style="min-width:0"><div>'+esc(x.title)+'</div><div class="muted" style="font-size:12px">'+fmt(x.date)+' · <span class="amt">'+rub(x.amount)+'</span></div></div>'+
+       (x.paid?'<button class="pill ok" data-paid="'+i+'">получено</button>':'<div class="row" style="flex-wrap:nowrap"><button class="pill" data-send="'+i+'">'+(x.sent?'ещё раз':'маме')+'</button><button class="pill" data-paid="'+i+'">пришли?</button></div>')+'</div>';
+  });
+  h+='</div>';
+
+  h+='<div class="card"><h2 style="margin-bottom:6px">Награды</h2>';
+  Object.keys(REWARDS).forEach(function(k){var x=REWARDS[k];h+='<div class="rw"><div><b style="font-size:14px">'+esc(x.title)+'</b><p class="muted" style="font-size:12px">'+esc(x.desc)+'</p></div><span class="amt">'+rub(x.amount)+'</span></div>'});
+  h+='</div>';
+
+  h+='<div class="card" style="display:flex;flex-direction:column;gap:10px"><h2>Резервная копия</h2>'+
+     '<p class="muted small">Прогресс хранится только на этом телефоне. Раз в неделю отправляй копию маме или в «Заметки» — если удалишь приложение, по ней всё восстановится.</p>'+
+     '<div class="row"><button class="btn" id="bk">Сохранить копию</button><button class="btn" id="rs">Восстановить</button></div></div>';
+  h+='<p class="muted" style="font-size:12px;text-align:center">Блоки собраны по темам ЕГЭ‑2027. Задания решай на Решу ЕГЭ.</p>';
+
+  el('app').innerHTML=h;
+  bind();
+}
+
+function bind(){
+  Array.prototype.forEach.call(document.querySelectorAll('[data-go]'),function(b){b.onclick=function(){openSession(b.getAttribute('data-go'))}});
+  Array.prototype.forEach.call(document.querySelectorAll('[data-tab]'),function(b){b.onclick=function(){tab=b.getAttribute('data-tab');try{localStorage.setItem(KEY+'-tab',tab)}catch(e){}render()}});
+  Array.prototype.forEach.call(document.querySelectorAll('[data-send]'),function(b){b.onclick=function(){sendToMom(S.rewards[+b.getAttribute('data-send')])}});
+  Array.prototype.forEach.call(document.querySelectorAll('[data-paid]'),function(b){b.onclick=function(){var x=S.rewards[+b.getAttribute('data-paid')];x.paid=!x.paid;save();render();if(x.paid)toast('Отмечено: деньги пришли')}});
+  el('boss').onclick=function(){addEntry({type:'boss'});toast('Босс побеждён! +100 XP')};
+  el('probe').onclick=function(){
+    var v=parseInt(el('pscore').value,10);
+    if(isNaN(v)||v<0||v>100){toast('Введи балл от 0 до 100');return}
+    addEntry({type:'probe',subj:el('psub').value,score:v});toast('Пробник записан. +150 XP');
+  };
+  el('bk').onclick=backup;
+  el('rs').onclick=restoreDialog;
+}
+
+function addEntry(e){
+  e.t=new Date().toISOString();
+  S.log.push(e);save();
+  collectRewards(compute());
+  render();showReward();
+}
+
+// ===================== Подход =====================
+function openSession(id){sess={id:id,ok:0,bad:0,run:0,best:0,hist:[]};drawSession();el('screen').hidden=false;el('screen').scrollTop=0}
+function drawSession(){
+  var x=blockInfo(sess.id),lv=C.blocks[sess.id].level,dots='';
+  for(var i=0;i<5;i++)dots+='<i class="'+(i<Math.min(sess.run,5)?'on':'')+'"></i>';
+  var h='<div class="sess"><div class="row between"><button class="btn" id="back">Назад</button><span class="muted small">'+esc(x.s.name)+' · '+LEVELS[lv]+'</span></div>'+
+    '<h1 style="font-size:26px">'+esc(x.name)+(x.s.id==='m'?' · ч. '+x.part:'')+'</h1>'+(x.note?'<p class="note">'+esc(x.note)+'</p>':'')+
+    '<a class="btn full" style="text-align:center;text-decoration:none;color:var(--fg);display:block" href="'+x.s.link+'" target="_blank" rel="noopener">Открыть задания на Решу ЕГЭ</a>'+
+    '<div style="text-align:center"><div class="lbl" style="margin-bottom:10px">Серия подряд · 5 = золото</div><div class="dots">'+dots+'</div></div>'+
+    '<div class="counter"><button class="cnt ok" id="ok"><b>'+sess.ok+'</b>Верно</button><button class="cnt bad" id="bad"><b>'+sess.bad+'</b>Ошибка</button></div>'+
+    '<div class="row between"><button class="btn" id="undo"'+(sess.hist.length?'':' disabled')+'>Отменить нажатие</button><span class="muted small">Лучшая серия: '+sess.best+'</span></div>'+
+    '<button class="btn pri full" id="finish" style="padding:17px"'+(sess.ok+sess.bad?'':' disabled')+'>Сохранить подход</button></div>';
+  el('screen').innerHTML=h;
+  el('back').onclick=function(){
+    if(sess.ok+sess.bad&&!backArmed){backArmed=true;toast('Подход не сохранён. Нажми «Назад» ещё раз, чтобы выйти.');setTimeout(function(){backArmed=false},3000);return}
+    backArmed=false;el('screen').hidden=true;sess=null;
+  };
+  el('ok').onclick=function(){sess.hist.push([sess.run,sess.best,'ok']);sess.ok++;sess.run++;sess.best=Math.max(sess.best,sess.run);drawSession();if(sess.run===5)toast('5 подряд! Сохрани подход — это золото')};
+  el('bad').onclick=function(){sess.hist.push([sess.run,sess.best,'bad']);sess.bad++;sess.run=0;drawSession()};
+  el('undo').onclick=function(){var p=sess.hist.pop();if(!p)return;if(p[2]==='ok')sess.ok--;else sess.bad--;sess.run=p[0];sess.best=p[1];drawSession()};
+  el('finish').onclick=function(){
+    var gain=sess.ok*10+sess.bad*3;
+    addEntry({type:'tasks',b:sess.id,ok:sess.ok,bad:sess.bad,best:sess.best});
+    el('screen').hidden=true;sess=null;toast('Сохранено. +'+gain+' XP');
+  };
+}
+var backArmed=false;
+
+// ===================== Награда и «Отправить маме» =====================
+function momText(r){return 'Мам, я заработал награду в «Прокачке ЕГЭ»: '+r.title+'. Переведи, пожалуйста, '+rub(r.amount)+' 🙏'}
+function sendToMom(r){
+  var text=momText(r);
+  function done(){r.sent=true;save();render()}
+  if(navigator.share){navigator.share({text:text}).then(done,function(){})}
+  else copyText(text,function(ok){if(ok){done();toast('Текст скопирован — отправь маме')}});
+}
+function copyText(text,cb){
+  try{navigator.clipboard.writeText(text).then(function(){cb(true)},function(){cb(fallbackCopy(text))})}catch(e){cb(fallbackCopy(text))}
+}
+function fallbackCopy(text){
+  var t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();
+  var ok=false;try{ok=document.execCommand('copy')}catch(e){}document.body.removeChild(t);return ok;
+}
+function showReward(){
+  var o=el('overlay');
+  if(!queue.length){o.hidden=true;return}
+  var r=queue[0];
+  o.innerHTML='<div class="modal reward"><span class="lbl">Награда</span><div class="sum">+'+rub(r.amount)+'</div><h2>'+esc(r.title)+'</h2>'+
+    '<p class="muted">Отправь маме сообщение — она переведёт деньги.</p>'+
+    '<button class="btn pri full" id="msend">Отправить маме</button><button class="btn full" id="mlater">Позже</button></div>';
+  o.hidden=false;
+  el('msend').onclick=function(){sendToMom(r);queue.shift();showReward()};
+  el('mlater').onclick=function(){queue.shift();showReward();toast('Отправить можно из кошелька')};
+}
+
+// ===================== Резервная копия =====================
+function backup(){
+  var code='PROKACHKA:'+btoa(unescape(encodeURIComponent(JSON.stringify(S))));
+  var text='Резервная копия «Прокачки ЕГЭ» от '+fmt(dk(new Date()))+'. Чтобы восстановить, скопируй всю строку ниже и вставь в приложении.\n\n'+code;
+  if(navigator.share){navigator.share({text:text}).then(function(){toast('Копия отправлена')},function(){})}
+  else copyText(text,function(ok){toast(ok?'Копия скопирована':'Не получилось скопировать')});
+}
+function restoreDialog(){
+  var o=el('overlay');
+  o.innerHTML='<div class="modal"><h2>Восстановить прогресс</h2><p class="muted small">Вставь текст резервной копии целиком. Текущий прогресс на телефоне заменится.</p>'+
+    '<textarea id="rcode" placeholder="PROKACHKA:…"></textarea><p class="small" id="rerr" style="color:var(--bad)"></p>'+
+    '<button class="btn pri full" id="rok">Восстановить</button><button class="btn full" id="rno">Отмена</button></div>';
+  o.hidden=false;
+  el('rno').onclick=function(){o.hidden=true};
+  el('rok').onclick=function(){
+    var raw=el('rcode').value,i=raw.indexOf('PROKACHKA:');
+    try{
+      if(i<0)throw 0;
+      var data=JSON.parse(decodeURIComponent(escape(atob(raw.slice(i+10).trim().split(/\s/)[0]))));
+      if(!data||!data.log||!data.rewards)throw 0;
+      S=data;save();o.hidden=true;render();toast('Прогресс восстановлен');
+    }catch(e){el('rerr').textContent='Это не похоже на копию. Скопируй сообщение целиком и вставь ещё раз.'}
+  };
+}
+
+// ===================== Установка на экран «Домой» =====================
+function installScreen(){
+  el('app').innerHTML='<div class="install"><img src="icon-180.png" alt=""><h1 style="font-size:28px">Прокачка ЕГЭ</h1>'+
+    '<p class="muted">Поставь приложение на экран «Домой» — так оно работает без интернета, а прогресс хранится в нём.</p>'+
+    '<div class="card" style="display:flex;flex-direction:column;gap:14px">'+
+    '<div class="step"><span class="n">1</span><p>Открой эту страницу в <strong>Safari</strong>.</p></div>'+
+    '<div class="step"><span class="n">2</span><p>Нажми «Поделиться» <span class="share-ic"></span> внизу экрана (или в меню «…»).</p></div>'+
+    '<div class="step"><span class="n">3</span><p>Пролистай вниз и выбери <strong>«На экран „Домой“»</strong>, затем «Добавить».</p></div>'+
+    '<div class="step"><span class="n">4</span><p>Открывай «Прокачку» только с иконки на экране.</p></div></div>'+
+    '<button class="btn full" id="skip">Открыть в браузере</button>'+
+    '<p class="muted" style="font-size:12px">В браузере прогресс хранится отдельно от приложения на экране «Домой» и не перенесётся.</p></div>';
+  el('skip').onclick=function(){try{sessionStorage.setItem(KEY+'-skip','1')}catch(e){}render()};
+}
+
+// ===================== Старт =====================
+try{var t=localStorage.getItem(KEY+'-tab');if(t&&/^[mre]$/.test(t))tab=t}catch(e){}
+var skip=false;try{skip=sessionStorage.getItem(KEY+'-skip')==='1'}catch(e){}
+if(isStandalone()||skip)render();else installScreen();
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&!sess&&(isStandalone()||skip))render()});
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+</script>
+</body>
+</html>
